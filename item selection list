@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ItemSelectionPage(),
+    );
+  }
+}
+
+class ItemSelectionPage extends StatefulWidget {
+  @override
+  _ItemSelectionPageState createState() => _ItemSelectionPageState();
+}
+
+class _ItemSelectionPageState extends State<ItemSelectionPage> {
+  List<Item> items = [
+    Item(name: "Item 1"),
+    Item(name: "Item 2"),
+    Item(name: "Item 3"),
+    Item(name: "Item 4"),
+    Item(name: "Item 5"),
+  ];
+
+  
+  int getSelectedCount() {
+    return items.where((item) => item.isSelected).length;
+  }
+
+  List<String> getSelectedItems() {
+    return items.where((item) => item.isSelected).map((item) => item.name).toList();
+  }
+
+  void _submitSelection() {
+    final selectedItems = getSelectedItems();
+    if (selectedItems.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('No items selected'),
+          content: Text('Please select at least one item.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+     
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Selected Items'),
+          content: Text('You selected: ${selectedItems.join(', ')}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Item Selection List'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            
+            Text(
+              'Selected Items: ${getSelectedCount()}',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+
+            
+            Expanded(
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return CheckboxListTile(
+                    title: Text(items[index].name),
+                    value: items[index].isSelected,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        items[index].isSelected = value!;
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+
+           
+            ElevatedButton(
+              onPressed: _submitSelection,
+              child: Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Item {
+  String name;
+  bool isSelected;
+
+  Item({required this.name, this.isSelected = false});
+}
